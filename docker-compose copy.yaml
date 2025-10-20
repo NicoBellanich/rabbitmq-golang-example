@@ -8,11 +8,6 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: pass
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     networks:
       - appnet
 
@@ -24,18 +19,16 @@ services:
     environment:
       RABBITMQ_URL: "amqp://user:pass@rabbitmq:5672/"
     depends_on:
-      rabbitmq:
-        condition: service_healthy
+      - rabbitmq
     networks:
       - appnet
 
   consumer:
     build: ./consumer
-    environment:
-      RABBITMQ_URL: "amqp://user:pass@rabbitmq:5672/"
     depends_on:
-      rabbitmq:
-        condition: service_healthy
+      - rabbitmq
+    environment:
+      - RABBITMQ_URL=amqp://user:pass@rabbitmq:5672/
     deploy:
       replicas: 3
     networks:
